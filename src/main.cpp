@@ -112,8 +112,18 @@ void setup()
     // set server pages
     server.serveStatic("/", SPIFFS, "/index.html");
     server.serveStatic("/", SPIFFS, "/index.html");
+
+    server.on("/leds", HTTP_POST, handleLEDs);
 }
 
+
+void handleLEDs(){
+    if(!(server.hasArg("red") || server.hasArg("blue") || server.hasArg("green") || server.hasArg("white"))){
+        server.send(400, "text/plain", "400: Invalid Request");
+        return;
+    }
+    
+}
 
 void loop()
 {
