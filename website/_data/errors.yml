@@ -1,0 +1,40 @@
+-
+  title: 400
+  subtitle: Hmm, bad request?
+  description: Seems like I can't process this request. Sure you're using the correct URI locator?
+-
+  title: 403
+  subtitle: Forbidden! You're not allowed here!
+  description: The request sent is valid, but the server refuses to handle it. Do you have the right permissions?
+-
+  title: 404
+  subtitle: Page not found, oops!
+  description: It seems like the page you are looking for is not there...
+-
+  title: 405
+  subtitle: Method not allowed on this page.
+  description: Seems you've got confused with a PUT, POST, DELETE or GET request.
+-
+  title: 40x
+  subtitle: This seems to be an uncommon error...
+  description: What are you doing? This error does not even have a dedicated error page!
+-
+  title: 500
+  subtitle: Internal server error, oops!
+  description: Well, an internal server error occcured.
+-
+  title: 501
+  subtitle: Are you from the future?
+  description: This method has not yet been implemented on this server.
+-
+  title: 502
+  subtitle: Bad gateway, why not take a different path?
+  description: Received invalid response from upstream server.
+-
+  title: 504
+  subtitle: Ran out of patience.
+  description: Did not receive in time response of upstream server.
+-
+  title: 50x
+  subtitle: This seems to be an uncommon error...
+  description: What are you doing? This error does not even have a dedicated error page!

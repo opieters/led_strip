@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% if page.title %}{{ page.title | strip_html }}{% else %}{{ site.name }}{% endif %}</title>
+    <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <link type="text/css" rel="stylesheet" href="static/main.css" />
+
+    <link href="img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    {{ page.head }}
+  </head>
+
+  <body>
+
+    <nav id="menu" class="menu">
+      <header>
+        <section class="menu-section">
+          <h3 class="menu-section-title">Menu</h3>
+          <ul class="menu-section-list">
+              <li><a class="page-link" href="/">Home</a>
+              <li><a class="page-link" href="/set_colour">Set Colour</a></li>
+          </ul>
+        </section>
+      </header>
+    </nav>
+    
+
+    <main id="panel">
+      <div class="page-content">
+        <div class="wrapper container">
+          <header>
+            <nav class="site-header">
+              <div class="row">
+                <div class="menu-toggle"><button class="toggle-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M64 144h384v32H64zM64 240h384v32H64zM64 336h384v32H64z"/></svg></button></div>
+                <div class="icon-wrapper left">
+                </div>
+                <div class="site-title"><a href="/">{{ site.title }}</a></div>
+              </div>
+              <div class="desktop-menu">
+                <ul>
+                    <li><a href="/set_colour">Set Colour</a></li>
+                </ul>
+              </div>
+            </nav>
+          </header>
+          {{ content }}
+        </div>
+
+      </div>
+
+      <div class="invisible-divider"></div>
+      
+      <footer class="site-footer">
+      </footer>
+
+      <script src="static/slideout.min.js" type="text/javascript"></script>
+      <script src="static/menu.js" type="text/javascript"></script>
+    </main>
+
+  </body>
+
+</html>
