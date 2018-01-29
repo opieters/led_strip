@@ -13,6 +13,7 @@
 #include <ArduinoOTA.h>
 #include <ESP8266WebServer.h>
 #include <FS.h>
+#include "website_handling.h"
 
 const uint16_t PixelCount = 3; // this example assumes 3 pixels, making it smaller will cause a failure
 const uint8_t PixelPin = 14;  // make sure to set this to the correct pin, ignored for Esp8266
@@ -110,19 +111,7 @@ void setup()
     strip.Show();
 
     // set server pages
-    server.serveStatic("/", SPIFFS, "/index.html");
-    server.serveStatic("/", SPIFFS, "/index.html");
-
-    server.on("/leds", HTTP_POST, handleLEDs);
-}
-
-
-void handleLEDs(){
-    if(!(server.hasArg("red") || server.hasArg("blue") || server.hasArg("green") || server.hasArg("white"))){
-        server.send(400, "text/plain", "400: Invalid Request");
-        return;
-    }
-    
+    configure_website_pages();
 }
 
 void loop()
