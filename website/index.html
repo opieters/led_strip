@@ -1,3 +1,159 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>LED Strip</title>
+    <meta name="description" content="LED strip controls.">
+    <link type="text/css" rel="stylesheet" href="static/main.css" />
+
+    <link href="img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <style>
+      fieldset{
+        border: none;
+      }
+      .preview-box {
+        width: 50px; 
+        height: 50px;
+        border-style: solid;
+        border-color: gray;
+        border-width: 2pt;
+        display: inline-block;
+      }
+      form fieldset output, label {
+        display: inline-block;
+        width: 4em;
+      }
+      #color-picker-container svg {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="panel">
+      <div class="page-content">
+        <div class="wrapper container">
+          <div class="invisible-divider"></div>
+          <h1>Pick A Color</h1>
+          <p>Select an RGB color. Additionally, a separate white component can also be set. Click to update the light strip after finding a good value.</p>
+          <div id="color-picker-container"></div>
+          <div class="invisible-divider"></div>
+          <div class="centre-element">
+          <div id="color-preview" class="preview-box"></div>
+          <div id="white-preview" class="preview-box"></div>
+          </div>
+          <div class="centre-element">
+            <form action="/set_colour" method="POST">
+              <fieldset>
+                <label for="red">Red</label>
+                <input type="range" min="0" max="255" id="red" name="red" step="1" value="0">
+                <output for="red" id="red_out">0</output>
+              </fieldset>  
+              <fieldset>
+                <label for="green">Green</label>
+                <input type="range" min="0" max="255" id="green" name="green" step="1" value="0">
+                <output for="green" id="green_out">0</output>
+              </fieldset>  
+              <fieldset>
+                <label for="blue">Blue</label>
+                <input type="range" min="0" max="255" id="blue" name="blue" step="1" value="0">
+                <output for="blue" id="blue_out">0</output>
+              </fieldset>  
+              <fieldset>
+                <label for="white">White</label>
+                <input type="range" min="0" max="255" id="white" name="white" step="1" value="0">
+                <output for="white" id="white_out">0</output>
+              </fieldset>  
+              <!--fieldset>
+                <label for="brightness">Brightness</label>
+                <input type="range" min="0" max="100" id="brightness" step="1" value="0">
+                <output for="brightness" id="brightness_out">0</output>
+              </fieldset-->  
+              <input type="submit" value="Update"> 
+            </form>
+          </div>
+        </div>
+      </div>
+      <script type="text/javascript" src="/static/iro.min.js"></script>
+      <script type="text/javascript">
+        // iro.js code
+        var demoColorPicker = new iro.ColorPicker("#color-picker-container"); 
+
+        // create varibales that select elements
+        var red = document.querySelector('#red');
+        var red_value = document.querySelector("#red_out");
+
+        var green = document.querySelector('#green');
+        var green_value = document.querySelector("#green_out");
+
+        var blue = document.querySelector('#blue');
+        var blue_value = document.querySelector("#blue_out");
+
+        var white = document.querySelector('#white');
+        var white_value = document.querySelector("#white_out");
+
+        // preview elements
+        var color_preview = document.getElementById("color-preview");
+        var white_preview = document.getElementById("white-preview");
+        
+        function setColor(){
+          // convert to hex strings
+          var red_hex = parseInt(red.value, 10).toString(16).toUpperCase();
+          var green_hex = parseInt(green.value, 10).toString(16).toUpperCase();
+          var blue_hex = parseInt(blue.value, 10).toString(16).toUpperCase();
+          var white_hex = parseInt(white.value, 10).toString(16).toUpperCase();
+
+          demoColorPicker.color.rgb = { r: red.value, g: green.value, b: blue.value };
+
+          // set the property value 
+          red_value.value = red_hex;
+          blue_value.value = blue_hex;
+          green_value.value = green_hex;
+          white_value.value = white_hex;
+          //white_value.value = "#" + pad(red_hex) + pad(green_hex) + pad(blue_hex);
+          //white_value.value = "#" + pad(red_hex) + pad(green_hex) + pad(blue_hex);
+
+          // update colors
+          color_preview.style = "background-color: " + "#" + pad(red_hex) + pad(green_hex) + pad(blue_hex);
+          white_preview.style = "background-color: " + "#" + pad(white_hex) + pad(white_hex) + pad(white_hex);
+        }
+        
+        function pad(n){
+          return (n.length<2) ? "0"+n : n;
+        }
+        
+        var color_list = [red, green, blue, white];
+        for(i=0;i<4;i++){
+          color_list[i].addEventListener("change", setColor, false);
+          color_list[i].addEventListener("input", setColor, false);
+        }
+
+        function update_color(){
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200){
+              
+            }
+          }
+        }
+
+        demoColorPicker.on("color:change", function(color, changes) {
+          var rgb = demoColorPicker.color.rgb;
+
+          red.value = rgb["r"];
+          green.value = rgb["g"];
+          blue.value = rgb["b"];
+
+          setColor();
+        });
+
+        setColor();
+      </script>
+    </main>
+  </body>
+</html>
