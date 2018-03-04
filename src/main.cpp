@@ -1,82 +1,63 @@
-// NeoPixelBrightness
-// This example will cycle brightness from high to low of
-// three pixels colored Red, Green, Blue.  
-// This demonstrates the use of the NeoPixelBrightnessBus 
-// with integrated brightness support
-//
-// There is serial output of the current state so you can 
-// confirm and follow along
-//
-
-#include <NeoPixelBrightnessBus.h> // instead of NeoPixelBus.h
-#include <ESP8266WiFi.h>
-#include <ArduinoOTA.h>
-#include <ESP8266WebServer.h>
-#include <FS.h>
+#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 #include "website_handling.h"
+#include <NeoPixelBrightnessBus.h> // instead of NeoPixelBus.h
 
-const uint16_t PixelCount = 3; // this example assumes 3 pixels, making it smaller will cause a failure
-const uint8_t PixelPin = 14;  // make sure to set this to the correct pin, ignored for Esp8266
+//needed for library
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
 
-#define colorSaturation 255 // saturation of color constants
-RgbwColor red(colorSaturation, 0, 0, 0);
-RgbwColor green(0, colorSaturation, 0, 0);
-RgbwColor blue(0, 0, colorSaturation, 0);
-RgbwColor white(0, 0, 0, colorSaturation);
+#include <ArduinoOTA.h>
 
-const char* hostname = "ledstrip";
-const char* ssid     = "yourssid";
-const char* password = "yourpassword";
+const uint16_t pixelCount = 120;
+const uint8_t pixelPin = 2;
 
-// Make sure to provide the correct color order feature
-// for your NeoPixels
-NeoPixelBrightnessBus<NeoRgbwFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
+// LED strip
+NeoPixelBrightnessBus<NeoRgbwFeature, NeoEsp8266Uart800KbpsMethod> strip(pixelCount, pixelPin);
 
+// Set web server port number to 80
 ESP8266WebServer server(80);
 
-// you loose the original color the lower the dim value used
-// here due to quantization
-const uint8_t c_MinBrightness = 8; 
-const uint8_t c_MaxBrightness = 255;
+// Variable to store the HTTP request
+String header;
 
-int8_t direction; // current direction of dimming
+void set_leds(RgbwColor color){
+    for(int i=0;i<pixelCount;i++){
+        strip.SetPixelColor(i, color);
+    }
+    strip.Show();
+}
 
-void setup()
-{
+void setup() {
+    // put your setup code here, to run once:
     Serial.begin(115200);
+
     while (!Serial); // wait for serial attach
 
-    Serial.println();
-    Serial.println("Initializing...");
-    Serial.flush();
-
-    // this resets all the neopixels to an off state
+    // set all LEDs to the off state
     strip.Begin();
     strip.Show();
 
-    direction = -1; // default to dim first
+    // set the hostname
+    wifi_station_set_hostname((char*) "ledstrip");
+
+    // WiFiManager
+    WiFiManager wifiManager;
+
+    //fetches ssid and pass from eeprom and tries to connect
+    //if it does not connect it starts an access point with the specified name
+    //here  "AutoConnectAP"
+    //and goes into a blocking loop awaiting configuration
+    wifiManager.autoConnect("AutoConnectAP");
+    //or use this for auto generated name ESP + ChipID
+    //wifiManager.autoConnect();
+
     
-    Serial.println();
-    Serial.println("Running...");
+    //if you get here you have connected to the WiFi
+    Serial.println("connected...yeey :)");
 
-    // set our three original colors
-    strip.SetPixelColor(0, red);
-    strip.SetPixelColor(1, green);
-    strip.SetPixelColor(2, blue);
-
-    // start WiFi
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-    WiFi.hostname(hostname);
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println("Ready");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    // configure the webserver
+    configure_website_pages();
 
     ArduinoOTA.setPort(4133);
     ArduinoOTA.setPassword("admin");
@@ -107,36 +88,9 @@ void setup()
         else if (error == OTA_END_ERROR) Serial.println("End Failed");
     });
     ArduinoOTA.begin();
-    
-    strip.Show();
-
-    // set server pages
-    configure_website_pages();
 }
 
-void loop()
-{
-    uint8_t brightness = strip.GetBrightness();
-    Serial.println(brightness);
-    
-    delay(100);
-
-    // swap diection of dim when limits are reached
-    //
-    if (direction < 0 && brightness <= c_MinBrightness)
-    {
-      direction = 1;
-    }
-    else if (direction > 0 && brightness >= c_MaxBrightness)
-    {
-      direction = -1;
-    }
-    // apply dimming
-    brightness += direction;
-    strip.SetBrightness(brightness);
-
-    // show the results
-    strip.Show();
-
+void loop() {
+    server.handleClient();
     ArduinoOTA.handle();
 }
